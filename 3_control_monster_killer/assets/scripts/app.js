@@ -12,12 +12,23 @@ const LOG_EVENT_PLAYER_HEAL = "HEAL_PLAYER";
 const LOG_EVENT_GAME_OVER = "GAME_OVER";
 
 const battlelog = [];
+let lastLogEntry;
 
-const enteredValue = prompt("Max life for you and for monster", "100");
+function getMaxLifeValue() {
+  const enteredValue = prompt("Max life for you and for monster", "100");
+  let parsedValue = parseInt(enteredValue);
+  if (isNaN(parsedValue) || parsedValue <= 0) {
+    throw { message: "Invalid input: not a number or less than 0" };
+  }
+  return parsedValue;
+}
 
-let chosenMaxLife = parseInt(enteredValue);
-
-if (isNaN(chosenMaxLife) || chosenMaxLife <= 0) {
+let chosenMaxLife;
+try {
+  chosenMaxLife = getMaxLifeValue();
+} catch (error) {
+  alert("Something went wrong with your input, we will use 100 for max life");
+  console.log(error);
   chosenMaxLife = 100;
 }
 
@@ -164,7 +175,18 @@ function healPlayerHandler() {
 }
 
 function printLogHandler() {
-  console.log(battlelog);
+  let i = 0;
+  for (const logEntry of battlelog) {
+    if ((!lastLogEntry && lastLogEntry !== 0) || lastLogEntry < i) {
+      console.log(`#${i}`);
+      for (const key in logEntry) {
+        console.log(`${key} => ${logEntry[key]}`);
+      }
+      lastLogEntry = i;
+      break;
+    }
+    i++;
+  }
 }
 
 attackBtn.addEventListener("click", attackHandler);
